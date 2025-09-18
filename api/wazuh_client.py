@@ -2,6 +2,7 @@ import time
 import requests
 import urllib3
 from utils.config import Config
+from utils.logger import logger
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -32,16 +33,24 @@ def get_token():
     token_cache = {"token": token, "expiry": now + TOKEN_EXPIRY}
     return token
 
+#Wazuh api calls with logging
 def call_wazuh(endpoint: str, params: dict = None):
     """Generic function to call Wazuh API with JWT."""
     token = get_token()
     headers = {"Authorization": f"Bearer {token}"}
 
     url = f"{BASE_URL}{endpoint}"
+    logger.info(f"Calling Wazuh API: {url} with params {params}")
+
     res = requests.get(url, headers=headers, params=params, verify=False)
 
     if res.status_code == 404:
+        logger.warning(f"404 Not Found: {endpoint}")
         return {"error": f"Endpoint {endpoint} not found"}
+
+    if res.status_code >= 400:
+        logger.error(f"Wazuh API Error {res.status_code}: {res.text}")
+
     return res.json()
 
 # Specific wrappers

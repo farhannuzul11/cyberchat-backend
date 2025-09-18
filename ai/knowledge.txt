@@ -1,0 +1,3 @@
+Rule 60204: Detects multiple Windows logon failures. Related to MITRE ATT&CK T1110 (Brute Force).
+PCI DSS 10.2.4 requires recording of all failed login attempts.
+HIPAA 164.312(b) requires audit controls for login failures.
